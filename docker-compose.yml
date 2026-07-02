@@ -1,0 +1,118 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mkjobs}
+      POSTGRES_DB: ${POSTGRES_DB:-mkjobs}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mkjobs}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    image: ghcr.io/your-org/mkjobs-api:latest
+    build: .
+    profiles: ["tools"]
+    command: alembic upgrade head
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mkjobs}
+      POSTGRES_DB: ${POSTGRES_DB:-mkjobs}
+    secrets:
+      - postgres_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - internal
+
+  api:
+    image: ghcr.io/your-org/mkjobs-api:latest
+    build: .
+    restart: unless-stopped
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mkjobs}
+      POSTGRES_DB: ${POSTGRES_DB:-mkjobs}
+      REDIS_URL: redis://redis:6379/0
+      PORT: 8000
+    secrets:
+      - postgres_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+      - edge-proxy
+
+  worker:
+    image: ghcr.io/your-org/mkjobs-api:latest
+    build: .
+    restart: unless-stopped
+    command: celery -A app.worker worker --loglevel=info
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mkjobs}
+      POSTGRES_DB: ${POSTGRES_DB:-mkjobs}
+      REDIS_URL: redis://redis:6379/0
+    secrets:
+      - postgres_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+
+  beat:
+    image: ghcr.io/your-org/mkjobs-api:latest
+    build: .
+    restart: unless-stopped
+    command: celery -A app.worker beat --loglevel=info
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mkjobs}
+      POSTGRES_DB: ${POSTGRES_DB:-mkjobs}
+      REDIS_URL: redis://redis:6379/0
+    secrets:
+      - postgres_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+  edge-proxy:
+    external: true
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+
+volumes:
+  postgres_data:
