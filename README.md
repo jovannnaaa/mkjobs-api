@@ -1,6 +1,5 @@
 # MkJobs-API
 
-![Python](https://img.shields.io/badge/python-%3E%3D3.12-blue) ![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue) ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 
 ## Table of Contents
 - [Introduction](#introduction)
