@@ -10,15 +10,6 @@ It provides:
 
 The stack is built around **FastAPI**, **SQLAlchemy**, **PostgreSQL**, **Celery**, and **Redis**.
 
-> This repository was built as an academic project demonstrating a production-shaped
-> data aggregation service: async API layer, background workers, cron-style
-> scheduling, cursor pagination, and event-driven webhook notifications.
-> Two example source adapters (`vrabotuvanje`, `cv_mk`) are included as scraper
-> *templates* — their CSS selectors / JSON field names are illustrative
-> placeholders and should be adapted to the real markup of each target site,
-> and each site's robots.txt / terms of service should be reviewed before
-> enabling scraping against it in production.
-
 ## Quick Start
 
 Run with Docker (recommended):
