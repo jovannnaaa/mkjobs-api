@@ -343,7 +343,7 @@ Webhook payload shape:
 }
 ```
 
-## Academic Notes
+## Notes
 
 This project was implemented for coursework to demonstrate:
 - Async web API design with FastAPI + SQLAlchemy 2.0 (async ORM)
@@ -355,11 +355,3 @@ This project was implemented for coursework to demonstrate:
   environment variables
 - Twelve-factor-style configuration (`.env` for non-secrets, Docker secrets
   for credentials) and a containerized, multi-service deployment topology
-
-The two included source adapters are templates for demonstration purposes; no
-scraping traffic is sent anywhere unless a Celery beat/worker process is
-actually running and a task is triggered.
-
-## License
-
-This project is licensed under the MIT License.
