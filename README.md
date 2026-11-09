@@ -1,21 +1,5 @@
 # MkJobs-API
 
-
-## Table of Contents
-- [Introduction](#introduction)
-- [Quick Start](#quick-start)
-- [Key Features](#key-features)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Run Modes](#run-modes)
-- [Usage](#usage)
-- [API](#api)
-- [Environment Variables](#environment-variables)
-- [Academic Notes](#academic-notes)
-- [License](#license)
-
-## Introduction
-
 MkJobs API is a tool that aggregates publicly listed job postings from Macedonian employment portals, company career pages, and government job boards into a single, queryable dataset.
 
 It provides:
